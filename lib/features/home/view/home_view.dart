@@ -2,8 +2,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:rick_and_morty_lesson/config/constants.dart';
-import 'package:rick_and_morty_lesson/models/character/character.dart';
+import 'package:rick_and_morty_lesson/dependency_injection/app_component.dart';
 import 'package:rick_and_morty_lesson/services/rick_and_morty_api/api.dart';
 
 class HomeView extends StatelessWidget {
@@ -18,14 +17,8 @@ class HomeView extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () async {
             try {
-              final response = await RickAndMortyApiClient(
-                dio,
-                baseUrl: AppConstants.rickAndMortyApiUrl,
-              ).getCharacters();
-
-              response.results.forEach((Character character) {
-                inspect(character.name);
-              });
+              final apiClient = getIt.get<RickAndMortyApiClient>();
+              final response = apiClient.getCharacters();
             } catch (e) {
               inspect(e);
             }
