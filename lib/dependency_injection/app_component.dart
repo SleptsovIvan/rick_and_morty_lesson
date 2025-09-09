@@ -11,7 +11,7 @@ configureDependencies() {
   _configureNetworkDependencies();
   _configureApiClients();
   _configureRepositories();
-  _configureUseCases()
+  _configureUseCases();
 }
 
 _configureNetworkDependencies() {
@@ -40,7 +40,8 @@ _configureRepositories() {
 _configureUseCases() {
   final RickAndMortyRepository rickAndMortyRepository = getIt
       .get<RickAndMortyRepository>();
-  
-  getIt
-      .registerLazySingleton<GetCharactersUseCase>(() => GetCharactersUseCase(rickAndMortyRepository));
+
+  getIt.registerLazySingleton<GetCharactersUseCase>(
+    () => GetCharactersUseCase(rickAndMortyRepository),
+  );
 }

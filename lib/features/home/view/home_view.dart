@@ -1,12 +1,10 @@
 import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rick_and_morty_lesson/dependency_injection/app_component.dart';
+import 'package:rick_and_morty_lesson/features/home/components/character_card.dart';
 import 'package:rick_and_morty_lesson/features/home/state/home_cubit.dart';
 import 'package:rick_and_morty_lesson/models/character/character.dart';
-import 'package:rick_and_morty_lesson/services/rick_and_morty_api/api.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -17,6 +15,10 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late Future<void> _future;
+
+  static const double _verticalGap = 10;
+  static const double _horizontalGap = 20;
+  static const double _horizontalPadding = 20;
 
   @override
   void initState() {
@@ -29,37 +31,67 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       // appBar: AppBar(),
       body: SafeArea(
-        child: BlocBuilder<HomeCubit, HomeState>(
-          builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      try {
-                        await context.read<HomeCubit>().getCharacters();
-                      } catch (e) {
-                        inspect(e);
-                      }
+        bottom: false,
+        child: FutureBuilder(
+          future: _future,
+          builder: (BuildContext context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.connectionState == ConnectionState.done) {
+              return BlocBuilder<HomeCubit, HomeState>(
+                builder: (context, state) {
+                  if (snapshot.hasError) {
+                    return Column(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(state.errorMessage ?? 'Some error...'),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await context.read<HomeCubit>().getCharacters();
+                          },
+                          child: Text('Try again'),
+                        ),
+                      ],
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      await context.read<HomeCubit>().getCharacters();
                     },
-                    child: Text('Get characters'),
-                  ),
-                ),
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                  sliver: SliverList.separated(
-                    itemCount: state.characters.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final Character character = state.characters[index];
-                      return Text(character.name);
-                    },
-                    separatorBuilder: (BuildContext context, index) {
-                      return SizedBox(height: 8);
-                    },
-                  ),
-                ),
-              ],
-            );
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: _horizontalPadding,
+                      ),
+                      child: CustomScrollView(
+                        slivers: [
+                          SliverGrid(
+                            delegate: SliverChildBuilderDelegate((
+                              BuildContext context,
+                              int index,
+                            ) {
+                              final character = state.characters[index];
+                              return CharacterCard(character: character);
+                            }, childCount: state.characters.length),
+                            gridDelegate:
+                                SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 215,
+                                  mainAxisSpacing: _verticalGap,
+                                  crossAxisSpacing: _horizontalGap,
+                                  childAspectRatio: 160 / 215,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+            return Container();
           },
         ),
       ),

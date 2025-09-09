@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_lesson/dependency_injection/app_component.dart';
 import 'package:rick_and_morty_lesson/domain/use_cases/get_characters_use_case.dart';
@@ -18,9 +19,16 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       final response = await _getCharactersUseCase.execute();
       state.characters = response.results;
-      emit(state.copyWith(characters: state.characters));
-    } catch (e) {
-      inspect(e);
+      state.errorMessage = null;
+      emit(
+        state.copyWith(
+          characters: state.characters,
+          errorMessage: state.errorMessage,
+        ),
+      );
+    } on DioException catch (e) {
+      state.errorMessage = e.message;
+      emit(state.copyWith(errorMessage: state.errorMessage));
     }
   }
 }
