@@ -86,7 +86,17 @@ class CharacterCard extends StatelessWidget {
                         }
                       },
                 ),
-                // Positioned(child: child)
+                Positioned(
+                  child: Container(
+                    width: _likeContainerSize,
+                    height: _likeContainerSize,
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteSmoke,
+                      borderRadius: BorderRadius.circular(_likeContainerSize),
+                    ),
+                    child: Center(child: Icon(Icons.add)),
+                  ),
+                ),
               ],
             ),
           ],
