@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:rick_and_morty_lesson/config/app_colors.dart';
 import 'package:rick_and_morty_lesson/config/helpers.dart';
+import 'package:rick_and_morty_lesson/gen/assets.gen.dart' show Assets;
 import 'package:rick_and_morty_lesson/models/character/character.dart';
 
 class CharacterCard extends StatelessWidget {
@@ -94,7 +96,9 @@ class CharacterCard extends StatelessWidget {
                       color: AppColors.whiteSmoke,
                       borderRadius: BorderRadius.circular(_likeContainerSize),
                     ),
-                    child: Center(child: Icon(Icons.add)),
+                    child: Center(
+                      child: SvgPicture.asset(Assets.images.unliked.path),
+                    ),
                   ),
                 ),
               ],

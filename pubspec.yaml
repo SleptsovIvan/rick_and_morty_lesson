@@ -33,7 +33,7 @@ dev_dependencies:
   flutter_gen_runner:
 
 flutter_gen:
-  integretions:
+  integrations:
     flutter_svg: true
 
 flutter:
