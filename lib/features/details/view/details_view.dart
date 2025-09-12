@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rick_and_morty_lesson/config/helpers.dart';
+import 'package:rick_and_morty_lesson/features/components/circle_back_button.dart';
 import 'package:rick_and_morty_lesson/features/details/state/details_cubit.dart';
 import 'package:rick_and_morty_lesson/models/character/character.dart';
 
@@ -13,6 +15,11 @@ class DetailsView extends StatefulWidget {
 
 class _DetailsViewState extends State<DetailsView> {
   late final _detailFuture;
+
+  static const double _leadingWidth = 76;
+  static const double _horizontalPadding = 20;
+  static const double _expandedHeight = 260;
+  static const double _loaderSize = 40;
 
   @override
   void initState() {
@@ -51,8 +58,78 @@ class _DetailsViewState extends State<DetailsView> {
                 }
 
                 final Character character = state.details!;
-                return CustomScrollView(slivers: [
-                    
+                return CustomScrollView(
+                  slivers: [
+                    SliverAppBar(
+                      leadingWidth: _leadingWidth,
+                      leading: Padding(
+                        padding: EdgeInsets.only(left: _horizontalPadding),
+                        child: CircleBackButton(),
+                      ),
+                      expandedHeight: _expandedHeight,
+                      flexibleSpace: SizedBox.expand(
+                        child: Image.network(
+                          character.image,
+                          fit: BoxFit.cover,
+                          frameBuilder:
+                              (
+                                BuildContext context,
+                                Widget child,
+                                int? frame,
+                                bool wasSyncLoaded,
+                              ) {
+                                if (wasSyncLoaded || frame != null) {
+                                  return Container(child: child);
+                                } else {
+                                  return Center(
+                                    child: SizedBox(
+                                      height: _loaderSize,
+                                      width: _loaderSize,
+                                      child: Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                          loadingBuilder:
+                              (
+                                BuildContext context,
+                                Widget child,
+                                ImageChunkEvent? loadingProgress,
+                              ) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                } else {
+                                  return Center(
+                                    child: SizedBox(
+                                      height: _loaderSize,
+                                      width: _loaderSize,
+                                      child: Center(
+                                        child: CircularProgressIndicator(
+                                          value:
+                                              loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? getImageLoadingProgress(
+                                                  loadingProgress,
+                                                )
+                                              : 0,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                        ),
+                      ),
+                    ),
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _horizontalPadding,
+                      ),
+                      sliver: SliverList.list(children: []),
+                    ),
                   ],
                 );
               },
