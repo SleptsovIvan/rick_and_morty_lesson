@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_lesson/features/home/components/character_card.dart';
 import 'package:rick_and_morty_lesson/features/home/state/home_cubit.dart';
-import 'package:rick_and_morty_lesson/models/character/character.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
