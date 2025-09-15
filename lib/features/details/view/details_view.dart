@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_lesson/config/helpers.dart';
 import 'package:rick_and_morty_lesson/features/components/circle_back_button.dart';
+import 'package:rick_and_morty_lesson/features/details/components/details_item.dart';
 import 'package:rick_and_morty_lesson/features/details/state/details_cubit.dart';
+import 'package:rick_and_morty_lesson/gen/assets.gen.dart';
 import 'package:rick_and_morty_lesson/models/character/character.dart';
 
 class DetailsView extends StatefulWidget {
@@ -128,7 +130,36 @@ class _DetailsViewState extends State<DetailsView> {
                       padding: EdgeInsets.symmetric(
                         horizontal: _horizontalPadding,
                       ),
-                      sliver: SliverList.list(children: []),
+                      sliver: SliverList.list(
+                        children: [
+                          DetailsItem(
+                            iconPath: Assets.images.information.path,
+                            label: 'Name',
+                            value: character.name.toLabelCase(),
+                          ),
+                          DetailsItem(
+                            iconPath: getCharacterStatusIconPath(
+                              character.status,
+                            ),
+                            label: 'Status',
+                            value: character.status.name.toLabelCase(),
+                          ),
+                          DetailsItem(
+                            iconPath: getCharacterSpeciesIconPath(
+                              character.species,
+                            ),
+                            label: 'Species',
+                            value: character.species.name.toLabelCase(),
+                          ),
+                          DetailsItem(
+                            iconPath: getCharacterGenderIconPath(
+                              character.gender,
+                            ),
+                            label: 'Gender',
+                            value: character.gender.name.toLabelCase(),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 );

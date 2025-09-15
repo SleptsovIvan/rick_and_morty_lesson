@@ -12,6 +12,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late Future<void> _future;
+  final ScrollController _scrollController = ScrollController();
 
   static const double _verticalGap = 10;
   static const double _horizontalGap = 20;
@@ -20,7 +21,21 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     _future = context.read<HomeCubit>().getCharacters();
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        if (!context.read<HomeCubit>().state.isAllLoaded) {
+          await context.read<HomeCubit>().loadMoreCharacters();
+        }
+      }
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,6 +79,7 @@ class _HomeViewState extends State<HomeView> {
                         horizontal: _horizontalPadding,
                       ),
                       child: CustomScrollView(
+                        controller: _scrollController,
                         slivers: [
                           SliverGrid(
                             delegate: SliverChildBuilderDelegate((
@@ -81,6 +97,10 @@ class _HomeViewState extends State<HomeView> {
                                   childAspectRatio: 160 / 215,
                                 ),
                           ),
+                          if (state.isLoadingMore)
+                            SliverToBoxAdapter(
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
                         ],
                       ),
                     ),

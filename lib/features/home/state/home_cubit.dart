@@ -8,19 +8,41 @@ part 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit()
-    : super(HomeState(isPending: false, characters: [], errorMessage: null));
+    : super(
+        HomeState(
+          isPending: false,
+          characters: [],
+          errorMessage: null,
+          currentPage: 1,
+          totalPages: 1,
+          isAllLoaded: false,
+          isLoadingMore: false,
+        ),
+      );
 
   final GetCharactersUseCase _getCharactersUseCase = getIt
       .get<GetCharactersUseCase>();
 
   getCharacters() async {
+    state.currentPage = 1;
+    state.isAllLoaded = false;
+    state.characters = [];
+    emit(
+      state.copyWith(
+        currentPage: state.currentPage,
+        isAllLoaded: state.isAllLoaded,
+        characters: state.characters,
+      ),
+    );
     try {
-      final response = await _getCharactersUseCase.execute();
+      final response = await _getCharactersUseCase.execute(state.currentPage);
       state.characters = response.results;
+      state.totalPages = response.info.pages;
       state.errorMessage = null;
       emit(
         state.copyWith(
           characters: state.characters,
+          totalPages: state.totalPages,
           errorMessage: state.errorMessage,
         ),
       );
@@ -28,5 +50,36 @@ class HomeCubit extends Cubit<HomeState> {
       state.errorMessage = e.message;
       emit(state.copyWith(errorMessage: state.errorMessage));
     }
+  }
+
+  loadMoreCharacters() async {
+    state.currentPage += 1;
+    state.isLoadingMore = true;
+    emit(state.copyWith(isLoadingMore: state.isLoadingMore));
+
+    if (state.currentPage == state.totalPages) {
+      state.isAllLoaded = true;
+      emit(state.copyWith(isAllLoaded: state.isAllLoaded));
+    }
+    try {
+      final response = await _getCharactersUseCase.execute(state.currentPage);
+      state.totalPages = response.info.pages;
+      state.isLoadingMore = false;
+      response.results.forEach((character) {
+        state.characters = [...state.characters, character];
+      });
+    } catch (e) {
+      state.isLoadingMore = false;
+      emit(state.copyWith(isLoadingMore: state.isLoadingMore));
+    }
+
+    emit(
+      state.copyWith(
+        characters: state.characters,
+        totalPages: state.totalPages,
+        currentPage: state.currentPage,
+        isLoadingMore: state.isLoadingMore,
+      ),
+    );
   }
 }

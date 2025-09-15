@@ -11,7 +11,7 @@ abstract class RickAndMortyApiClient {
       _RickAndMortyApiClient;
 
   @GET('/character')
-  Future<CharacterResponse> getCharacters();
+  Future<CharacterResponse> getCharacters(@Query('page') int page);
 
   @GET('/character/{id}')
   Future<Character> getCharacterDetails(@Path('id') String id);
