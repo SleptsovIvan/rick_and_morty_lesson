@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rick_and_morty_lesson/features/home/components/character_card.dart';
 import 'package:rick_and_morty_lesson/features/home/state/home_cubit.dart';
+import 'package:rick_and_morty_lesson/models/character/character.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -86,9 +88,33 @@ class _HomeViewState extends State<HomeView> {
                               BuildContext context,
                               int index,
                             ) {
-                              final character = state.characters[index];
-                              return CharacterCard(character: character);
-                            }, childCount: state.characters.length),
+                              if (index <= (state.characters.length - 2)) {
+                                final character = state.characters[index];
+                                return CharacterCard(character: character);
+                              } else {
+                                return Skeletonizer(
+                                  child: CharacterCard(
+                                    character: Character(
+                                      id: 0,
+                                      name: 'Some long long long name',
+                                      status: CharacterStatus.unknown,
+                                      species: CharacterSpecies.other,
+                                      type: 'SomeType',
+                                      gender: CharacterGender.unknown,
+                                      origin: Origin(name: 'name', url: 'url'),
+                                      location: Location(
+                                        name: 'name',
+                                        url: 'url',
+                                      ),
+                                      image: 'image',
+                                      episode: [],
+                                      url: 'url',
+                                      created: 'created',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }, childCount: state.characters.length + 2),
                             gridDelegate:
                                 SliverGridDelegateWithMaxCrossAxisExtent(
                                   maxCrossAxisExtent: 215,
